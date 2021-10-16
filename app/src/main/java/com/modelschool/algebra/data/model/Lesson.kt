@@ -6,6 +6,6 @@ data class Lesson(
     val id: String,
     val title: String,
     val exercises: Int = 10,
-    val status: LessonState = LessonState.LOCKED,
+    val status: String = LessonState.LOCKED.name,
     val percent: Double = 0.0
 )
