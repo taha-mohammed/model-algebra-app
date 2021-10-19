@@ -15,8 +15,8 @@ class ReportViewModel(
     fun createReport(percent: Double, wrongAnswers: List<wrongAnswer>) = viewModelScope.launch {
         val status = if (percent > 0.5) LessonState.SUCCESS.name else LessonState.FAILED.name
         val report = LessonReport(
-            userId = "",
-            username = "",
+            studentId = "",
+            studentName = "",
             percent = percent,
             status = status,
             wrongAnswers = wrongAnswers
