@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "156318515273",
+    "project_id": "algebra-app-728e6",
+    "storage_bucket": "algebra-app-728e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:156318515273:android:ac89982eeca0c76f2abf98",
+        "android_client_info": {
+          "package_name": "com.modelschool.algebra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "156318515273-ud36u0dcf093ehr7dael3eo7fblm0s2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJRC59H6KTLuPsZ79YyO2ctfsUA1JekDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "156318515273-ud36u0dcf093ehr7dael3eo7fblm0s2b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
