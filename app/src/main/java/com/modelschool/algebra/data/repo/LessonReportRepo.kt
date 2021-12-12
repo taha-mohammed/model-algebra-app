@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface LessonReportRepo {
 
-    fun getMyReports(lessonId: String): Flow<Result<List<LessonReport>>>
-    suspend fun createReport(lessonId: String, report: LessonReport): Result<Unit>
+    fun getReports(topicId: String, userId: String): Flow<Result<List<LessonReport>>>
+    suspend fun createReport(topicId: String, report: LessonReport): Result<Unit>
 }

@@ -3,20 +3,34 @@ package com.modelschool.algebra.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.modelschool.algebra.data.model.Lesson
+import com.modelschool.algebra.data.model.LessonReport
 import com.modelschool.algebra.data.repo.LessonRepo
+import com.modelschool.algebra.data.repo.LessonReportRepo
+import com.modelschool.algebra.utils.LessonState
 import com.modelschool.algebra.utils.Result
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LessonViewModel(
+@HiltViewModel
+class LessonViewModel @Inject constructor(
     private val lessonRepo: LessonRepo,
-    private val topicId: String): ViewModel() {
+    private val reportRepo: LessonReportRepo,
+    private val userId: String,
+    private val topicId: String
+) : ViewModel() {
 
     private val _lessonsStateFlow = MutableStateFlow<Result<List<Lesson>>>(Result.Loading)
+    private val _reportsStateFlow = MutableStateFlow<Result<List<LessonReport>>>(Result.Loading)
+
+    @ExperimentalCoroutinesApi
     val lessonsStateFlow: StateFlow<Result<List<Lesson>>>
-        get() = _lessonsStateFlow
+        get() = lessonsWithReports(
+            _lessonsStateFlow.value,
+            (_reportsStateFlow.value as Result.Value).value
+        ) as StateFlow<Result<List<Lesson>>>
 
     init {
         viewModelScope.launch {
@@ -29,6 +43,39 @@ class LessonViewModel(
                     }
                 }
             }
+            reportRepo.getReports(topicId, userId).collect {
+                when (it) {
+                    is Result.Value -> {
+                        _reportsStateFlow.value = it
+                    }
+                    is Result.Error -> {
+                    }
+                }
+            }
         }
     }
+
+    @ExperimentalCoroutinesApi
+    fun lessonsWithReports(
+        lessons: Result<List<Lesson>>,
+        reports: List<LessonReport>
+    ) = callbackFlow<Result<List<Lesson>>> {
+        when (lessons) {
+            is Result.Value -> {
+                lessons.value.map { lesson ->
+                    val report = reports.find { it.lessonId == lesson.id }
+                    Lesson(
+                        id = lesson.id,
+                        title = lesson.title,
+                        exercises = lesson.exercises,
+                        status = report?.status ?: LessonState.LOCKED.name,
+                        percent = report?.percent ?: 0.0
+                    )
+                }
+            }
+            else -> {
+            }
+        }
+        send(lessons)
+    }.flowOn(viewModelScope.coroutineContext)
 }
