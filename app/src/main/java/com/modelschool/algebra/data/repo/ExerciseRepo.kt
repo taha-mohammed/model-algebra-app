@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ExerciseRepo {
 
-    fun getExercises(lessonId: String): Flow<Result<List<Exercise>>>
+    fun getExercises(topicId: String, lessonId: String): Flow<Result<List<Exercise>>>
 }
