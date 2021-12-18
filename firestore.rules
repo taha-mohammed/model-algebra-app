@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /topics/{topicId} {
+      allow read: if true
+      allow create, update, delete: if false
+      
+      match /lessons/{lessonId} {
+      	allow read: if true
+      	allow create, update, delete: if false
+        
+        match /exercises/{exerciseId} {
+          allow read: if true
+          allow create, update, delete: if false
+        }
+    	}
+      
+      match /lessonReports/{reportId} {
+      	allow read, create: if true
+      	allow update, delete: if false
+    	}
+    }
+    match /students/{studentId} {
+      allow read, create, update: if true
+      allow delete: if false
+    }
+  }
+}

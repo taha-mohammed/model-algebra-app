@@ -23,7 +23,7 @@ class LessonReportRepoImpl @Inject constructor() : LessonReportRepo {
 
         val collection = db.collection(Constants.TOPIC_COLLECTION)
             .document(topicId).collection(Constants.LESSON_REPORT_COLLECTION)
-            .whereEqualTo("userId", userId)
+            .whereEqualTo("studentId", userId)
         val snapshotListener = collection.addSnapshotListener { value, error ->
             val response = if (error == null) {
                 Result.Value(toReports(value))

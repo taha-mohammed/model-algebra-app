@@ -54,7 +54,6 @@ class StudentRepoImpl @Inject constructor(private val appPrefs: AppPrefs) : Stud
     override suspend fun isExist(student: Student): Result<Student> {
         val result = db.collection(Constants.STUDENT_COLLECTION)
             .whereEqualTo("name", student.name)
-            .whereEqualTo("password", student.password)
             .get()
         return if (result.isSuccessful) Result.Value(toStudent(result.result).first()) else Result.Error(result.exception!!)
     }

@@ -21,17 +21,19 @@ class LoginViewModel @Inject constructor(private val authRepo: StudentRepo) : Vi
 
     fun login(student: Student) = viewModelScope.launch {
         val data = authRepo.isExist(student)
-        when (data) {
+        _loginState.value = when (data) {
             is Result.Value -> {
-                if (data.value.status.equals(StudentState.CONFIRMED.name)) {
-                    _loginState.value = authRepo.login(student)
-                } else {
-                    _loginState.value = Result.Error(Exception("Student is not confirmed"))
+                if (data.value.password == student.password){
+                    if (data.value.status == StudentState.CONFIRMED.name) {
+                        authRepo.login(student)
+                    } else {
+                        Result.Error(Exception("Student is not confirmed"))
+                    }
+                }else{
+                    Result.Error(Exception("Password is wrong"))
                 }
             }
-            is Result.Error -> {
-                _loginState.value = Result.Error(Exception("Student is not Exist"))
-            }
+            else -> Result.Error(Exception("Student is not Exist"))
         }
     }
 }
