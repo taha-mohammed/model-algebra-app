@@ -24,7 +24,11 @@ class LessonRepoImpl @Inject constructor() : LessonRepo {
             .document(topicId).collection(Constants.LESSON_COLLECTION)
         val snapshotListener = collection.addSnapshotListener { value, error ->
             val response = if (error == null) {
-                Result.Value(toLessons(value))
+                if (value != null) {
+                    Result.Value(toLessons(value))
+                } else {
+                    Result.Empty
+                }
             } else {
                 Result.Error(error)
             }

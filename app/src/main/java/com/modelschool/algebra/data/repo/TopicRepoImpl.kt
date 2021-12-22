@@ -23,7 +23,11 @@ class TopicRepoImpl @Inject constructor() : TopicRepo {
         val collection = db.collection(Constants.TOPIC_COLLECTION)
         val snapshotListener = collection.addSnapshotListener { value, error ->
             val response = if (error == null) {
-                Result.Value(toTopics(value))
+                if (value != null) {
+                    Result.Value(toTopics(value))
+                } else {
+                    Result.Empty
+                }
             } else {
                 Result.Error(error)
             }

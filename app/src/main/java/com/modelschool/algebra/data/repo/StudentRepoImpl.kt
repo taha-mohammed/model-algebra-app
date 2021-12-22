@@ -5,8 +5,10 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.getField
 import com.google.firebase.ktx.Firebase
 import com.modelschool.algebra.data.AppPrefs
+import com.modelschool.algebra.data.awaitTaskCompletable
+import com.modelschool.algebra.data.awaitTaskResult
 import com.modelschool.algebra.data.model.Student
-import com.modelschool.algebra.data.model.UserPreferences
+import com.modelschool.algebra.data.toRegistrationStudent
 import com.modelschool.algebra.utils.Constants
 import com.modelschool.algebra.utils.Result
 import com.modelschool.algebra.utils.StudentState
@@ -17,19 +19,19 @@ class StudentRepoImpl @Inject constructor(private val appPrefs: AppPrefs) : Stud
     private val db = Firebase.firestore
 
     override suspend fun register(student: Student): Result<Unit> {
-        val result = db.collection(Constants.STUDENT_COLLECTION).add(student)
-        return if (result.isSuccessful) Result.Value(Unit) else Result.Error(result.exception!!)
+
+        val reference = db.collection(Constants.STUDENT_COLLECTION)
+
+        return try {
+            awaitTaskCompletable(reference.add(student.toRegistrationStudent))
+            Result.Value(Unit)
+        } catch (exception: Exception) {
+            Result.Error(exception)
+        }
     }
 
     override suspend fun login(student: Student): Result<Unit> {
-        appPrefs.setValue(
-            UserPreferences(
-                student.id,
-                student.name,
-                student.classNo,
-                student.level
-            )
-        )
+        appPrefs.setValue(student)
         return Result.Value(Unit)
     }
 
@@ -38,7 +40,7 @@ class StudentRepoImpl @Inject constructor(private val appPrefs: AppPrefs) : Stud
         return Result.Value(Unit)
     }
 
-    override suspend fun isSigned(): Result<Boolean> {
+    override suspend fun isLoggedIn(): Result.Value<Boolean> {
         return Result.Value(appPrefs.getValue() != null)
     }
 
@@ -52,22 +54,24 @@ class StudentRepoImpl @Inject constructor(private val appPrefs: AppPrefs) : Stud
     }
 
     override suspend fun isExist(student: Student): Result<Student> {
-        val result = db.collection(Constants.STUDENT_COLLECTION)
+        val reference = db.collection(Constants.STUDENT_COLLECTION)
             .whereEqualTo("name", student.name)
-            .get()
-        return if (result.isSuccessful) Result.Value(toStudent(result.result).first()) else Result.Error(result.exception!!)
+
+        return try {
+            val task = awaitTaskResult(reference.get())
+            Result.Value(toStudent(task).first())
+        } catch (exception: Exception) {
+            Result.Error(exception)
+        }
     }
 
     override suspend fun getCurrent(): Result<Student> {
-        val student = appPrefs.getValue()!!
-        return Result.Value(
-            Student(
-                id = student.id,
-                name = student.name,
-                classNo = student.classNo,
-                level = student.level
-            )
-        )
+        val student = appPrefs.getValue()
+        return if (student != null) {
+            Result.Value(student)
+        } else {
+            Result.Error(Exception("You are not logged in"))
+        }
     }
 
     private fun toStudent(value: QuerySnapshot?): List<Student> {
@@ -78,6 +82,7 @@ class StudentRepoImpl @Inject constructor(private val appPrefs: AppPrefs) : Stud
                 Student(
                     id = documentSnapshot.id,
                     name = documentSnapshot.getString("name")!!,
+                    password = documentSnapshot.getString("password")!!,
                     classNo = documentSnapshot.getField<Int>("classNo")!!,
                     level = documentSnapshot.getField<Int>("level")!!,
                     status = documentSnapshot.getString("status")!!

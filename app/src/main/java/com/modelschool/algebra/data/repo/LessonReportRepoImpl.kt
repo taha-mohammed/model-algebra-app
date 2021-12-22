@@ -3,6 +3,7 @@ package com.modelschool.algebra.data.repo
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.modelschool.algebra.data.awaitTaskCompletable
 import com.modelschool.algebra.data.model.LessonReport
 import com.modelschool.algebra.utils.Constants
 import com.modelschool.algebra.utils.Result
@@ -11,7 +12,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class LessonReportRepoImpl @Inject constructor() : LessonReportRepo {
@@ -26,7 +26,11 @@ class LessonReportRepoImpl @Inject constructor() : LessonReportRepo {
             .whereEqualTo("studentId", userId)
         val snapshotListener = collection.addSnapshotListener { value, error ->
             val response = if (error == null) {
-                Result.Value(toReports(value))
+                if (value != null) {
+                    Result.Value(toReports(value))
+                } else {
+                    Result.Empty
+                }
             } else {
                 Result.Error(error)
             }
@@ -39,14 +43,19 @@ class LessonReportRepoImpl @Inject constructor() : LessonReportRepo {
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun createReport(topicId: String, report: LessonReport) =
-        withContext(Dispatchers.IO) {
+    override suspend fun createReport(topicId: String, report: LessonReport): Result<Unit> {
+        var result: Result<Unit> = Result.Idle
 
-            val data = db.collection(Constants.TOPIC_COLLECTION).document(topicId)
-                .collection(Constants.LESSON_REPORT_COLLECTION).add(report)
+        val reference = db.collection(Constants.TOPIC_COLLECTION).document(topicId)
+            .collection(Constants.LESSON_REPORT_COLLECTION)
 
-            if (data.isSuccessful) Result.Value(Unit) else Result.Error(data.exception!!)
+        return try {
+            awaitTaskCompletable(reference.add(report))
+            Result.Value(Unit)
+        } catch (exception: Exception) {
+            Result.Error(exception)
         }
+    }
 
     private fun toReports(value: QuerySnapshot?): List<LessonReport> {
         val reportList = mutableListOf<LessonReport>()

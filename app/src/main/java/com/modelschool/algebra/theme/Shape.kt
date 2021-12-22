@@ -1,4 +1,4 @@
-package com.modelschool.algebra.ui.theme
+package com.modelschool.algebra.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

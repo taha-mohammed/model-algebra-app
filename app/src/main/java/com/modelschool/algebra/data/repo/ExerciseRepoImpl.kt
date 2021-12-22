@@ -26,7 +26,11 @@ class ExerciseRepoImpl @Inject constructor(): ExerciseRepo {
                 .document(topicId).collection(Constants.LESSON_COLLECTION)
                 .document(lessonId).collection(Constants.EXERCISE_COLLECTION).get()
                 .addOnSuccessListener { data ->
-                    result = Result.Value(toExercises(data))
+                    if (data != null) {
+                        result = Result.Value(toExercises(data))
+                    } else {
+                        Result.Empty
+                    }
                 }.addOnFailureListener { e ->
                     result = Result.Error(e)
                 }

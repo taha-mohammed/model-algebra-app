@@ -12,19 +12,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegistrationViewModel @Inject constructor(val authRepo: StudentRepo): ViewModel() {
+class RegistrationViewModel @Inject constructor(private val authRepo: StudentRepo) : ViewModel() {
 
-    private val _registerState = mutableStateOf<Result<Unit>>(Result.Loading)
+    private val _registerState = mutableStateOf<Result<Unit>>(Result.Idle)
     val registerState: State<Result<Unit>>
         get() = _registerState
 
     fun register(student: Student) = viewModelScope.launch {
-        val data = authRepo.isExist(student)
-        when (data) {
+        _registerState.value = Result.Loading
+        when (authRepo.isExist(student)) {
             is Result.Value -> {
                 _registerState.value = Result.Error(Exception("Student is already exist"))
             }
-            is Result.Error -> {
+            else -> {
                 _registerState.value = authRepo.register(student)
             }
         }

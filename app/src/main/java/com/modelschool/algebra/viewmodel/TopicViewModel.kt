@@ -10,35 +10,41 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TopicModelView @Inject constructor(
+class TopicViewModel @Inject constructor(
     private val topicRepo: TopicRepo,
     private val studentRepo: StudentRepo
 ) : ViewModel() {
 
-    private val _topicsStateFlow = MutableStateFlow<Result<List<Topic>>>(Result.Loading)
+    private val _topicsStateFlow = MutableStateFlow<Result<List<Topic>>>(Result.Idle)
     val topicsStateFlow: StateFlow<Result<List<Topic>>>
         get() = _topicsStateFlow
 
     init {
         viewModelScope.launch {
-            topicRepo.getAllTopics().collect {
-                when (it) {
-                    is Result.Value -> {
-                        _topicsStateFlow.value = Result.Value(lockTopic(it.value))
-                    }
-                    is Result.Error -> {
+            topicRepo.getAllTopics()
+                .onStart { _topicsStateFlow.value = Result.Loading }
+                .collect {
+                    when (it) {
+                        is Result.Value -> {
+                            _topicsStateFlow.value = Result.Value(lockTopic(it.value))
+                        }
+                        is Result.Empty -> {
+                            _topicsStateFlow.value = Result.Empty
+                        }
                     }
                 }
-            }
         }
     }
 
     suspend fun lockTopic(topics: List<Topic>): List<Topic> {
-        return when (val student = studentRepo.getCurrent()) {
+        val student = studentRepo.getCurrent()
+
+        return when (student) {
             is Result.Value -> {
                 val level = student.value.level
                 topics.mapIndexed { index, topic ->
