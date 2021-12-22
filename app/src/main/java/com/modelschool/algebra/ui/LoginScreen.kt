@@ -15,17 +15,12 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.modelschool.algebra.compose.AboutUs
-import com.modelschool.algebra.compose.DialogLoading
-import com.modelschool.algebra.compose.HeightSpacer
-import com.modelschool.algebra.compose.ShowDialog
+import com.modelschool.algebra.compose.*
 import com.modelschool.algebra.utils.Result
 import com.modelschool.algebra.viewmodel.LoginViewModel
 
@@ -103,20 +98,7 @@ fun LoginFields(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Surface(
-            modifier = Modifier.size(180.dp, 35.dp),
-            shape = CircleShape,
-            color = Color.Black,
-            contentColor = Color(0xFFBBB000),
-            elevation = 8.dp
-        ) {
-            Text(
-                text = "Login Form",
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        TitleBox(text = "Login Form", modifier = Modifier.size(180.dp, 35.dp))
 
         TextField(
             value = name,

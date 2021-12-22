@@ -4,9 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.modelschool.algebra.viewmodel.LessonViewModel
 import com.modelschool.algebra.viewmodel.LoginViewModel
 import com.modelschool.algebra.viewmodel.RegistrationViewModel
 import com.modelschool.algebra.viewmodel.TopicViewModel
@@ -16,6 +19,7 @@ object MainDestinations {
     const val LOGIN_ROUTE = "login"
     const val REGISTRATION_ROUTE = "registration"
     const val TOPIC_ROUTE = "topics"
+    const val LESSON_ROUTE = "lessons"
 }
 
 @Composable
@@ -55,7 +59,17 @@ fun AlgebraNavGraph(
         composable(MainDestinations.TOPIC_ROUTE) {
             val topicViewModel = hiltViewModel<TopicViewModel>()
             TopicScreen(
-                topicViewModel = topicViewModel
+                topicViewModel = topicViewModel,
+                navToLesson = actions.navigateToLesson
+            )
+        }
+        composable(
+            route = "${MainDestinations.TOPIC_ROUTE}/{topic_id}/${MainDestinations.LESSON_ROUTE}",
+            arguments = listOf(navArgument("topic_id") { type = NavType.StringType })
+        ) {
+            val lessonViewModel = hiltViewModel<LessonViewModel>()
+            LessonScreen(
+                lessonViewModel = lessonViewModel
             )
         }
     }
@@ -65,6 +79,10 @@ fun AlgebraNavGraph(
  * Models the navigation actions in the app.
  */
 class MainActions(navController: NavHostController) {
+    val navigateToLesson: (String) -> Unit = { topicId: String ->
+        navController.navigate("${MainDestinations.TOPIC_ROUTE}/$topicId/${MainDestinations.LESSON_ROUTE}")
+    }
+
     val upPress: () -> Unit = {
         navController.navigateUp()
     }

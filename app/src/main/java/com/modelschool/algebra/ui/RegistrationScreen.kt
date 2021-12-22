@@ -146,20 +146,7 @@ fun RegistrationFields(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Surface(
-            modifier = Modifier.size(200.dp, 35.dp),
-            shape = CircleShape,
-            color = Color.Black,
-            contentColor = Color(0xFFBBB000),
-            elevation = 8.dp
-        ) {
-            Text(
-                text = "Registration Form",
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        TitleBox(text = "Registration Form", modifier = Modifier.size(200.dp, 35.dp))
 
         TextField(
             value = name,

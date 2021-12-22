@@ -1,5 +1,6 @@
 package com.modelschool.algebra.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.modelschool.algebra.data.model.Topic
@@ -10,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,15 +20,15 @@ class TopicViewModel @Inject constructor(
     private val studentRepo: StudentRepo
 ) : ViewModel() {
 
-    private val _topicsStateFlow = MutableStateFlow<Result<List<Topic>>>(Result.Idle)
+    private val _topicsStateFlow = MutableStateFlow<Result<List<Topic>>>(Result.Loading)
     val topicsStateFlow: StateFlow<Result<List<Topic>>>
         get() = _topicsStateFlow
 
     init {
         viewModelScope.launch {
             topicRepo.getAllTopics()
-                .onStart { _topicsStateFlow.value = Result.Loading }
                 .collect {
+                    Log.d("Topic", it.toString())
                     when (it) {
                         is Result.Value -> {
                             _topicsStateFlow.value = Result.Value(lockTopic(it.value))
@@ -41,17 +41,16 @@ class TopicViewModel @Inject constructor(
         }
     }
 
-    suspend fun lockTopic(topics: List<Topic>): List<Topic> {
-        val student = studentRepo.getCurrent()
+    private suspend fun lockTopic(topics: List<Topic>): List<Topic> {
 
-        return when (student) {
+        return when (val student = studentRepo.getCurrent()) {
             is Result.Value -> {
                 val level = student.value.level
                 topics.mapIndexed { index, topic ->
                     Topic(
                         topic.id,
                         topic.title,
-                        index > level
+                        index >= level
                     )
                 }
             }
