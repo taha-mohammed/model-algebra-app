@@ -1,5 +1,6 @@
 package com.modelschool.algebra.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -20,7 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.modelschool.algebra.compose.*
 import com.modelschool.algebra.data.model.Topic
 import com.modelschool.algebra.utils.Result
@@ -32,6 +35,9 @@ fun TopicScreen(
     navToLesson: (topicId: String) -> Unit
 ) {
     val context = LocalContext.current
+    val topicState = topicViewModel.topicsStateFlow.value
+    Log.d("Topic screen", topicState.toString())
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -44,7 +50,7 @@ fun TopicScreen(
 
         TitleBox(text = "Welcome", modifier = Modifier.size(150.dp, 35.dp))
 
-        when (val topicState = topicViewModel.topicsStateFlow.value) {
+        when (topicState) {
             is Result.Loading -> {
                 FullScreenLoading()
             }
@@ -96,16 +102,19 @@ fun TopicCard(topic: Topic, onClick: (topicId: String) -> Unit) {
                 } else {
                     onClick(topic.id)
                 }
-            },
-        shape = MaterialTheme.shapes.medium
+            }
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            AutoSizeText(
+            Text(
                 text = topic.title,
-                textStyle = TextStyle(fontWeight = FontWeight.ExtraBold)
+                style = TextStyle(
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center
+                )
             )
             if (topic.locked) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {

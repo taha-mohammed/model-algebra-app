@@ -1,5 +1,6 @@
 package com.modelschool.algebra.data.repo
 
+import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -20,9 +21,11 @@ class LessonRepoImpl @Inject constructor() : LessonRepo {
     @ExperimentalCoroutinesApi
     override fun getLessons(topicId: String) = callbackFlow {
 
+        Log.d("LessonRepo", "listen")
         val collection = db.collection(Constants.TOPIC_COLLECTION)
             .document(topicId).collection(Constants.LESSON_COLLECTION)
         val snapshotListener = collection.addSnapshotListener { value, error ->
+            Log.d("LessonRepo", "get response")
             val response = if (error == null) {
                 if (value != null) {
                     Result.Value(toLessons(value))
@@ -32,6 +35,7 @@ class LessonRepoImpl @Inject constructor() : LessonRepo {
             } else {
                 Result.Error(error)
             }
+            Log.d("LessonRepo", response.toString())
 
             this.trySend(response).isSuccess
         }

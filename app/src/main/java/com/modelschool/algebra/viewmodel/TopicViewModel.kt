@@ -26,9 +26,9 @@ class TopicViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            Log.d("Topic", "initialize")
             topicRepo.getAllTopics()
                 .collect {
-                    Log.d("Topic", it.toString())
                     when (it) {
                         is Result.Value -> {
                             _topicsStateFlow.value = Result.Value(lockTopic(it.value))
@@ -37,13 +37,16 @@ class TopicViewModel @Inject constructor(
                             _topicsStateFlow.value = Result.Empty
                         }
                     }
+                    Log.d("Topic", _topicsStateFlow.value.toString())
                 }
         }
     }
 
     private suspend fun lockTopic(topics: List<Topic>): List<Topic> {
+        val student = studentRepo.getCurrent()
+        Log.d("Topic", student.toString())
 
-        return when (val student = studentRepo.getCurrent()) {
+        return when (student) {
             is Result.Value -> {
                 val level = student.value.level
                 topics.mapIndexed { index, topic ->

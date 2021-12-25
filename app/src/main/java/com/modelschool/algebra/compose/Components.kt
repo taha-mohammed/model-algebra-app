@@ -2,7 +2,11 @@ package com.modelschool.algebra.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,5 +35,17 @@ fun TopBar(title: String) {
             .fillMaxWidth()
             .height(2.dp)
             .background(Color.Black))
+    }
+}
+
+@Composable
+fun BackButton(
+    onBack: () -> Unit
+){
+    Row {
+        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+        Button(onClick = { onBack() }) {
+            Text(text = "Back")
+        }
     }
 }
