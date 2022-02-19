@@ -12,14 +12,12 @@ import com.modelschool.algebra.data.repo.StudentRepo
 import com.modelschool.algebra.utils.LessonState
 import com.modelschool.algebra.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class LessonViewModel @Inject constructor(
     private val lessonRepo: LessonRepo,
@@ -47,12 +45,18 @@ class LessonViewModel @Inject constructor(
                     Log.d("Lesson", "lesson collect result $it")
                     when (it) {
                         is Result.Value -> {
-                            _lessonsStateFlow.value = it
-                            _finalLessonsStateFlow.value = lessonsWithReports(it, _reportsStateFlow.value)
+                            _lessonsStateFlow.value = Result.Value(it.value.reversed())
+                            _finalLessonsStateFlow.value = lessonsWithReports(
+                                _lessonsStateFlow.value,
+                                _reportsStateFlow.value
+                            )
                         }
                         is Result.Empty -> {
                             _lessonsStateFlow.value = Result.Empty
                             _finalLessonsStateFlow.value = Result.Empty
+                        }
+                        is Result.Error -> {
+                            _finalLessonsStateFlow.value = it
                         }
                     }
                 }
@@ -65,13 +69,13 @@ class LessonViewModel @Inject constructor(
                     when (it) {
                         is Result.Value -> {
                             _reportsStateFlow.value = it
-                            _finalLessonsStateFlow.value = lessonsWithReports(_lessonsStateFlow.value, it)
                         }
 
                         is Result.Empty -> {
                             _reportsStateFlow.value = Result.Empty
                         }
                     }
+                    _finalLessonsStateFlow.value = lessonsWithReports(_lessonsStateFlow.value, it)
                 }
         }
     }

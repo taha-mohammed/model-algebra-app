@@ -1,82 +1,66 @@
 package com.modelschool.algebra.compose
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Surface
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.modelschool.algebra.R
+import com.modelschool.algebra.theme.AlgebraAppTheme
 
-@Preview
 @Composable
-fun AboutUs(){
-
+fun AboutUs() {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Surface(
-            modifier = Modifier.size(180.dp, 35.dp),
-            shape = CircleShape,
-            color = Color.Black,
-            contentColor = Color(0xFFBBB000),
-            elevation = 8.dp
-        ) {
-            Text(
-                text = "Working Team",
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        TitleBox(text = stringResource(R.string.about_us_title), modifier = Modifier.size(180.dp, 35.dp))
 
         HeightSpacer(value = 4)
 
-        Text(text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = Color(0xFF5F5108), fontWeight = FontWeight.Light)){
-                append("Student Idea : ")
-            }
-            withStyle(style = SpanStyle(color = Color.Black)){
-                append("Hussein Mohammed Al-Hamed")
-            }
-        })
-        Text(text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = Color(0xFF5F5108), fontWeight = FontWeight.Light)){
-                append("Student Idea : ")
-            }
-            withStyle(style = SpanStyle(color = Color.Black)){
-                append("Hussein Mohammed Al-Hamed")
-            }
-        })
-        Text(text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = Color(0xFF5F5108), fontWeight = FontWeight.Light)){
-                append("Student Idea : ")
-            }
-            withStyle(style = SpanStyle(color = Color.Black)){
-                append("Hussein Mohammed Al-Hamed")
-            }
-        })
-        Text(text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = Color(0xFF5F5108), fontWeight = FontWeight.Light)){
-                append("Student Idea : ")
-            }
-            withStyle(style = SpanStyle(color = Color.Black)){
-                append("Hussein Mohammed Al-Hamed")
-            }
-        })
+        Person(role = "Student Idea", name = "Hussein Mohammed Al-Hamed")
+        Person(role = "Student Idea", name = "Hussein Mohammed Al-Hamed")
+        Person(role = "Student Idea", name = "Hussein Mohammed Al-Hamed")
+        Person(role = "Student Idea", name = "Hussein Mohammed Al-Hamed")
+        Person(role = "Student Idea", name = "Hussein Mohammed Al-Hamed")
     }
 
+}
+
+@Composable
+fun Person(role: String, name: String){
+    Text(text = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = MaterialTheme.colors.primaryVariant, fontWeight = FontWeight.Light)) {
+            append("$role : ")
+        }
+        withStyle(style = SpanStyle(color = Color.Black)) {
+            append(name)
+        }
+    })
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AboutUsPreview() {
+    AlgebraAppTheme() {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            AboutUs()
+        }
+    }
 }

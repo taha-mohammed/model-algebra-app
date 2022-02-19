@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.modelschool.algebra.data.model.Answer
 import com.modelschool.algebra.data.model.LessonReport
-import com.modelschool.algebra.data.model.wrongAnswer
 import com.modelschool.algebra.data.repo.LessonReportRepo
 import com.modelschool.algebra.data.repo.StudentRepo
 import com.modelschool.algebra.utils.LessonState
@@ -28,7 +28,7 @@ class ReportViewModel @Inject constructor(
     val state: State<Result<Unit>>
         get() = _state
 
-    fun completeLesson(percent: Double, wrongAnswers: List<wrongAnswer>) = viewModelScope.launch {
+    fun completeLesson(percent: Double, wrongAnswers: List<Answer>) = viewModelScope.launch {
         _state.value = Result.Loading
         val status = if (percent > 0.5) LessonState.SUCCESS.name else LessonState.FAILED.name
         val student = authRepo.getCurrent() as Result.Value

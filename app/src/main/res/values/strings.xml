@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">Algebra App</string>
+    <string name="about_us_title">فريق العمل</string>
+    <string name="name_field_placeholder">أدخل اسمك الثلاثي</string>
+    <string name="name_field_label">اسم الطالب</string>
+    <string name="password_field_placeholder">أدخل كلمة المرور</string>
+    <string name="password_field_label">كلمة المرور</string>
+    <string name="grade_field_title">الصف</string>
+    <string name="class_field_title">الشعبة</string>
+    <string name="back_button">رجوع</string>
+    <string name="empty_view_message">لا توجد بيانات</string>
+    <string name="exit_dialog_title">الخروج من التطبيق</string>
+    <string name="exit_dialog_text">هل أنت متأكد؟</string>
+    <string name="exit_dialog_confirm">نعم</string>
+    <string name="exit_dialog_dismiss">لا</string>
+    <string name="lesson_screen_title">الدروس</string>
+    <string name="empty_lessons">لا توجد دروس</string>
+    <string name="topic_screen_title">الوحدات</string>
+    <string name="welcome">Welcome</string>
+    <string name="empty_topics">لا توجد وحدات</string>
+    <string name="locked_topic_message">أكمل الوحدات السابقة</string>
+    <string name="registration_form">Registration Form</string>
+    <string name="empty_email_password">الرجاء ادخال الاسم وكلمة المرور</string>
+    <string name="full_name_message">الرجاء ادخال الاسم الثلاثي</string>
+    <string name="signup_button">حساب جديد</string>
+    <string name="login_form">Login Form</string>
+    <string name="login_button">تسجيل الدخول</string>
+    <string name="first_grade">الأول</string>
+    <string name="second_grade">الثاني</string>
+    <string name="third_grade">الثالث</string>
 </resources>

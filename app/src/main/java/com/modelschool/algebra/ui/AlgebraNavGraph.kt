@@ -9,10 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.modelschool.algebra.viewmodel.LessonViewModel
-import com.modelschool.algebra.viewmodel.LoginViewModel
-import com.modelschool.algebra.viewmodel.RegistrationViewModel
-import com.modelschool.algebra.viewmodel.TopicViewModel
+import com.modelschool.algebra.viewmodel.*
 
 object MainDestinations {
     const val SPLASH_ROUTE = "splash"
@@ -20,6 +17,7 @@ object MainDestinations {
     const val REGISTRATION_ROUTE = "registration"
     const val TOPIC_ROUTE = "topics"
     const val LESSON_ROUTE = "lessons"
+    const val EXERCISE_ROUTE = "exercises"
 }
 
 @Composable
@@ -68,8 +66,28 @@ fun AlgebraNavGraph(
             arguments = listOf(navArgument("topic_id") { type = NavType.StringType })
         ) {
             val lessonViewModel = hiltViewModel<LessonViewModel>()
+            val topicId = navController.currentBackStackEntry?.savedStateHandle?.get<String>("topic_id")
             LessonScreen(
-                lessonViewModel = lessonViewModel
+                lessonViewModel = lessonViewModel,
+                onBack = actions.upPress,
+                navToExercise = { lessonId ->
+                    if (topicId != null) {
+                        actions.navigateToExercise(topicId, lessonId)
+                    }
+                }
+            )
+        }
+        composable(
+            route = "${MainDestinations.TOPIC_ROUTE}/{topic_id}/" +
+                    "${MainDestinations.LESSON_ROUTE}/{lesson_id}/" +
+                    MainDestinations.EXERCISE_ROUTE,
+            arguments = listOf(navArgument("topic_id") { type = NavType.StringType },
+                navArgument("lesson_id") { type = NavType.StringType })
+        ) {
+            val exerciseViewModel = hiltViewModel<ExerciseViewModel>()
+            ExerciseScreen(
+                exerciseViewModel = exerciseViewModel,
+                onBack = actions.upPress
             )
         }
     }
@@ -81,6 +99,13 @@ fun AlgebraNavGraph(
 class MainActions(navController: NavHostController) {
     val navigateToLesson: (String) -> Unit = { topicId: String ->
         navController.navigate("${MainDestinations.TOPIC_ROUTE}/$topicId/${MainDestinations.LESSON_ROUTE}")
+    }
+    val navigateToExercise: (String, String) -> Unit = { topicId: String, lessonId: String ->
+        navController.navigate(
+            "${MainDestinations.TOPIC_ROUTE}/$topicId/" +
+                    "${MainDestinations.LESSON_ROUTE}/$lessonId/" +
+                    MainDestinations.EXERCISE_ROUTE
+        )
     }
 
     val upPress: () -> Unit = {

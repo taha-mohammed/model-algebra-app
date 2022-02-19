@@ -1,9 +1,7 @@
 package com.modelschool.algebra.compose
 
-import androidx.compose.foundation.background
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -12,16 +10,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.modelschool.algebra.R
 
 
 @Composable
@@ -49,7 +47,6 @@ fun DialogLoading(
                 contentAlignment= Center,
                 modifier = Modifier
                     .size(100.dp)
-                    .background(White, shape = RoundedCornerShape(8.dp))
             ) {
                 CircularProgressIndicator()
             }
@@ -58,8 +55,11 @@ fun DialogLoading(
 }
 
 @Composable
-fun ShowDialog(message: String){
-    val openDialog = remember { mutableStateOf(true)  }
+fun ShowDialog(
+    message: String,
+    showDialog: Boolean = true
+){
+    val openDialog = remember { mutableStateOf(showDialog)  }
 
     if (openDialog.value) {
 
@@ -82,8 +82,9 @@ fun ShowDialog(message: String){
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun EmptyView(message: String = ""){
+fun EmptyView(message: String = stringResource(R.string.empty_view_message)){
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -114,45 +115,54 @@ fun HeightSpacer(value: Int) = Spacer(modifier = Modifier
 fun TitleBox(text: String, modifier: Modifier) {
     Surface(
         modifier = modifier,
-        shape = CircleShape,
+        shape = MaterialTheme.shapes.medium,
         color = Color.Black,
-        contentColor = Color(0xFFBBB000),
+        contentColor = MaterialTheme.colors.primary,
         elevation = 8.dp
     ) {
         Text(
             text = text,
             textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.h5
         )
     }
 }
 
 @Composable
-fun AutoSizeText(
-    text: String,
-    textStyle: TextStyle,
-    modifier: Modifier = Modifier
-) {
-    val scaledTextStyle = remember { mutableStateOf(textStyle) }
-    val readyToDraw = remember { mutableStateOf(false) }
+fun ExitAppDialog(
+    showDialog: Boolean,
+    onDismiss: (Boolean) -> Unit
+){
+    val activity = (LocalLifecycleOwner.current as ComponentActivity)
 
-    Text(
-        text,
-        modifier.drawWithContent {
-            if (readyToDraw.value) {
-                drawContent()
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                onDismiss(false)
+            },
+            title = {
+                Text(stringResource(R.string.exit_dialog_title))
+            },
+            text = {
+                Text(stringResource(R.string.exit_dialog_text))
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDismiss(false)
+                        activity.finish()
+                    }) {
+                    Text(stringResource(R.string.exit_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onDismiss(false)
+                    }) {
+                    Text(stringResource(R.string.exit_dialog_dismiss))
+                }
             }
-        },
-        style = scaledTextStyle.value,
-        softWrap = false,
-        onTextLayout = { textLayoutResult ->
-            if (textLayoutResult.didOverflowWidth) {
-                scaledTextStyle.value =
-                    scaledTextStyle.value.copy(fontSize = scaledTextStyle.value.fontSize * 0.9)
-            } else {
-                readyToDraw.value = true
-            }
-        }
-    )
+        )
+    }
 }

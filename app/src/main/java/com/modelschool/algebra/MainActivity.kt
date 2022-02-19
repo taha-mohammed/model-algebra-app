@@ -7,7 +7,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import com.modelschool.algebra.theme.AlgebraAppTheme
 import com.modelschool.algebra.ui.AlgebraNavGraph
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,9 +21,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AlgebraAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    AlgebraNavGraph()
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl ) {
+                    // A surface container using the 'background' color from the theme
+                    Surface(color = MaterialTheme.colors.background) {
+                        AlgebraNavGraph()
+                    }
                 }
             }
         }

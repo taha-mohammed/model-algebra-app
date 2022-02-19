@@ -31,10 +31,13 @@ class TopicViewModel @Inject constructor(
                 .collect {
                     when (it) {
                         is Result.Value -> {
-                            _topicsStateFlow.value = Result.Value(lockTopic(it.value))
+                            _topicsStateFlow.value = Result.Value(lockTopic(it.value.reversed()))
                         }
                         is Result.Empty -> {
                             _topicsStateFlow.value = Result.Empty
+                        }
+                        is Result.Error -> {
+                            _topicsStateFlow.value = it
                         }
                     }
                     Log.d("Topic", _topicsStateFlow.value.toString())

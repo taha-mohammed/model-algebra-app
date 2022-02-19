@@ -2,8 +2,8 @@ package com.modelschool.algebra.ui
 
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,20 +12,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.modelschool.algebra.R
 import com.modelschool.algebra.compose.*
 import com.modelschool.algebra.data.model.Topic
+import com.modelschool.algebra.theme.AlgebraAppTheme
 import com.modelschool.algebra.utils.Result
 import com.modelschool.algebra.viewmodel.TopicViewModel
 
@@ -36,26 +35,30 @@ fun TopicScreen(
 ) {
     val context = LocalContext.current
     val topicState = topicViewModel.topicsStateFlow.value
+    var exitState by remember { mutableStateOf(false) }
+    ExitAppDialog(exitState) { exitState = it }
     Log.d("Topic screen", topicState.toString())
 
+    BackHandler {
+        exitState = true
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(Color.LightGray)
             .fillMaxSize()
     ) {
-        TopBar(title = "Topics")
+        TopBar(title = stringResource(R.string.topic_screen_title))
 
         HeightSpacer(value = 10)
 
-        TitleBox(text = "Welcome", modifier = Modifier.size(150.dp, 35.dp))
+        TitleBox(text = stringResource(R.string.welcome), modifier = Modifier.size(150.dp, 35.dp))
 
         when (topicState) {
             is Result.Loading -> {
                 FullScreenLoading()
             }
             is Result.Empty -> {
-                EmptyView("No topics where found")
+                EmptyView(stringResource(R.string.empty_topics))
             }
             is Result.Error -> {
                 Toast.makeText(
@@ -69,7 +72,7 @@ fun TopicScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(items = topicState.value, key = { item -> item.id }) { item ->
-                        TopicCard(topic = item, onClick = {navToLesson(it)})
+                        TopicCard(topic = item, onClick = { navToLesson(it) })
                     }
                 }
             }
@@ -84,7 +87,6 @@ fun TopicCard(topic: Topic, onClick: (topicId: String) -> Unit) {
     Card(
         elevation = 4.dp,
         border = BorderStroke(2.dp, Color.Black),
-        contentColor = Color.Black,
         backgroundColor = Color.Transparent,
         modifier = Modifier
             .size(150.dp)
@@ -95,7 +97,7 @@ fun TopicCard(topic: Topic, onClick: (topicId: String) -> Unit) {
                     Toast
                         .makeText(
                             context,
-                            "Complete previous topics",
+                            context.getString(R.string.locked_topic_message),
                             Toast.LENGTH_SHORT
                         )
                         .show()
@@ -105,16 +107,14 @@ fun TopicCard(topic: Topic, onClick: (topicId: String) -> Unit) {
             }
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(4.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = topic.title,
-                style = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center
-                )
+                style = MaterialTheme.typography.h3
             )
             if (topic.locked) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
@@ -125,6 +125,28 @@ fun TopicCard(topic: Topic, onClick: (topicId: String) -> Unit) {
                     )
                 }
             }
+        }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun TopicScreenPreview() {
+    AlgebraAppTheme() {
+        Column {
+            TopicCard(
+                topic = Topic(
+                    "",
+                    "New Topic",
+                    false
+                ), onClick = {})
+            TopicCard(
+                topic = Topic(
+                    "",
+                    "Locked Topic",
+                    true
+                ), onClick = {})
         }
     }
 }
