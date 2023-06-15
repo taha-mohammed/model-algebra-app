@@ -86,7 +86,7 @@ fun RegistrationContent(
     onSignUpClick: () -> Unit
 ) {
     Column(
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(MaterialTheme.colors.primary)
@@ -104,7 +104,7 @@ fun RegistrationContent(
             onClassNoSelected = onClassNoSelected
         )
 
-        AboutUs()
+        HeightSpacer(10)
 
         SignUpButton(name = name, password = password, grade = grade, onSignUpClick = onSignUpClick)
     }

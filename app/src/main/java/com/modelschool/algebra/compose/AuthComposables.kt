@@ -29,6 +29,7 @@ fun NameField(
     TextField(
         value = name,
         modifier = Modifier
+            .fillMaxWidth()
             .shadow(2.dp, CircleShape),
         placeholder = { Text(text = stringResource(R.string.name_field_placeholder)) },
         label = { Text(text = stringResource(R.string.name_field_label)) },
@@ -53,6 +54,7 @@ fun PasswordField(
     TextField(
         value = password,
         modifier = Modifier
+            .fillMaxWidth()
             .shadow(2.dp, CircleShape),
         placeholder = { Text(text = stringResource(R.string.password_field_placeholder)) },
         label = { Text(text = stringResource(R.string.password_field_label)) },
